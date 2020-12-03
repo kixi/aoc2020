@@ -2,10 +2,15 @@
   (:require [clojure.string :as s]
             [clojure.java.io :as io]))
 
+(defn slurp-lines
+  [resource-name]
+  (->
+   resource-name
+   io/resource
+   slurp
+   s/split-lines))
 
 (defn slurp-numbers [resource-name]
   (->>
-   (io/resource resource-name)
-   slurp
-   s/split-lines
+   (slurp-lines resource-name)
    (map read-string)))
