@@ -75,7 +75,7 @@ iyr:2011 ecl:brn hgt:59in")
                (case u
                  "in" (<= 59 (parse-long y) 76)
                  "cm" (<= 150 (parse-long y) 193)
-                 :else false))
+                 false))
              (catch Exception _ false)))
    "hcl" (fn [x] (re-matches #"^#[0-9a-f]{6}$" x))
    "ecl" #{"amb" "blu" "brn" "gry" "grn" "hzl" "oth"}
