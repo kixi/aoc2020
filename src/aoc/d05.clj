@@ -1,6 +1,7 @@
 (ns aoc.d05
   (:require [clojure.string :as str]
             [aoc.cmn :as cmn]
+            [clojure.set :as set]
             [clojure.java.io :as io]))
 
 
@@ -54,3 +55,8 @@
                curr))
            (first seats)
            (rest seats)))
+
+;; star 2 sets
+(let [all (set (range (first seats)
+                      (last seats)))]
+  (first (set/difference all (set seats))))
