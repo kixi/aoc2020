@@ -33,29 +33,24 @@
   (map seat-id)
   (apply max))
 
-;; star 2
-(let [seats
+(def seats
       (->>
        (cmn/slurp-lines "d05.txt")
        (map seat-id)
-       sort)]
-    (->>
+       sort))
+;; star 2
+(->>
      (map (fn [s1 s2] [s1 s2 (- s2 s1)]) seats (rest seats))
      (filter (fn [[s1 _ d]] (= d 2)))
      (map (fn [[s1 _ _]] s1))
      first
-     inc))
+     inc)
 
 ;; star 2 reduce
-(let [seats
-      (->>
-       (cmn/slurp-lines "d05.txt")
-       (map seat-id)
-       sort)]
-  (->>
+(->>
    (reduce (fn [last curr]
              (if (= (- curr last) 2)
                (reduced (inc last))
                curr))
            (first seats)
-           (rest seats))))
+           (rest seats)))
