@@ -4,59 +4,25 @@
             [clojure.set :as set]
             [clojure.java.io :as io]))
 
+(def letters {\F 0 \B 1 \L 0 \R 1})
 
+(def input (cmn/slurp-lines "d05.txt"))
 
-
-(def ex-seat "FBFBBFFRLR")
-
-(defn get-row-cols [seat]
-  (let [[_ row col] (re-find #"^([FB]{7})([LR]{3})$" seat)]
-    [row col]))
-
-(get-row-cols ex-seat)
-
-(defn bin [bs z o]
-  (let [s (-> bs
-              (str/replace z "0")
-              (str/replace o "1"))]
-    (Integer/parseInt s 2)))
+(defn bin->dec [x]
+  (reduce (fn [s x] (+ (* 2 s) x))
+          0
+          x))
 
 (defn seat-id [seat]
-  (let [[row col] (get-row-cols seat)]
-    (+
-       (* (bin row "F" "B") 8)
-       (bin col "L" "R"))))
+ (bin->dec (map letters seat)))
 
-(seat-id ex-seat)
-;; star 1
-(->>
-  (cmn/slurp-lines "d05.txt")
-  (map seat-id)
-  (apply max))
+(def seat-ids (map seat-id input))
 
-(def seats
-      (->>
-       (cmn/slurp-lines "d05.txt")
-       (map seat-id)
-       sort))
+;;;; star 1
+(apply max seat-ids)
+
 ;; star 2
-(->>
-     (map (fn [s1 s2] [s1 s2 (- s2 s1)]) seats (rest seats))
-     (filter (fn [[s1 _ d]] (= d 2)))
-     (map (fn [[s1 _ _]] s1))
-     first
-     inc)
-
-;; star 2 reduce
-(->>
-   (reduce (fn [last curr]
-             (if (= (- curr last) 2)
-               (reduced (inc last))
-               curr))
-           (first seats)
-           (rest seats)))
-
-;; star 2 sets
-(let [all (set (range (first seats)
-                      (last seats)))]
-  (first (set/difference all (set seats))))
+(->> (partition 2 1 (sort seat-ids))
+     (some (fn [[x0 x1]]
+             (when (= 2 (- x1 x0))
+               (inc x0)))))
