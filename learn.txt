@@ -4,9 +4,9 @@ re-find
 re-seq
 
 
-partition-all 2 1 xs
+(partition-all 2 1 xs)
 instead of
-map vector xs (rest xs)
+(map vector xs (rest xs))
 
 reduced to stop reduce - can be also used for own steps
 (reduced? x) to test if a val was reduced

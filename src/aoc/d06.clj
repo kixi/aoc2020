@@ -7,7 +7,7 @@
 (def input
   (->
    (slurp (io/resource "d06.txt"))
-   (str/split #"\n\n")))
+   (str/split #"\R\R")))
 
 ;; star1
 (->>
