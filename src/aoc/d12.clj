@@ -26,19 +26,13 @@ F11"))
   (->> (cmn/slurp-lines "d12.txt")
        (map #(re-find #"(\w)(\d+)" %))
        (map (fn [[_ d s]]
-              [(keyword  d) (read-string s)]
-              ))))
-
-
-(def pos
-  {:dir [1 0]
-   :pos [0 0]})
+              [(keyword  d) (read-string s)]))))
 
 (defn move-dir [pos dir arg]
   (prn pos dir arg)
   (mapv (fn [p d] (+ p (* d arg))) pos dir ))
 
-(defn change-dir [dir [f arg]]
+(defn change-dir [dir f arg]
   (first
    (drop  (/ arg 90)
           (iterate (turns f) dir))) )
@@ -46,30 +40,19 @@ F11"))
 (defn move [{:keys [dir pos] :as position} [inst arg]]
   (cond
     (directions inst)
-    (update position :pos move-dir (directions inst) arg )
+    (update position :pos move-dir (directions inst) arg)
 
     (turns inst)
-    (let [d (first  (drop (/ arg 90)
-                          (iterate (turns inst) pos)))]
-      (->
-       position
-       (update :pos change-dir [inst arg]  ))
-      )
+    (update position :pos change-dir inst arg)
     :else
-    (update position :ship move-dir pos arg)
-
-    )
-  )
+    (update position :ship move-dir pos arg)))
 
 
 (def pos
   {:dir [1 0]
    :pos [10 1]
    :ship [0 0]})
-
-(reduce move pos instructions)
-(:ship *1)
-(apply + *1)
-(first
- (drop  (/ 180 90)
-        (iterate (turns :L) [1 0])))
+(->>
+ (reduce move pos instructions)
+ (:ship )
+ (apply + ))
