@@ -8,6 +8,11 @@ re-seq
 instead of
 (map vector xs (rest xs))
 
+(some->)
+(str/escape)
+(-> ....
+   (->> ...))
+
 reduced to stop reduce - can be also used for own steps
 (reduced? x) to test if a val was reduced
 
