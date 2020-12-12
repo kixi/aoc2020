@@ -1,9 +1,6 @@
 (ns aoc.d12
-  (:require [clojure.string :as str]
-            [aoc.cmn :as cmn]
-            [clojure.set :as set]
-            [clojure.java.io :as io]
-            [clojure.math.combinatorics :as c]))
+  (:require [aoc.cmn :as cmn]
+            [clojure.string :as str]))
 
 (def d (str/split-lines "F10
 N3
@@ -19,8 +16,8 @@ F11"))
    :N [0 1]})
 
 (def turns
-  {:R (fn [[x y]] [y (- x)] )
-   :L (fn [[x y]] [(- y) x])})
+  {:R (partial cmn/rotate :cw)
+   :L (partial cmn/rotate :ccw)})
 
 (def instructions
   (->> (cmn/slurp-lines "d12.txt")
@@ -28,31 +25,31 @@ F11"))
        (map (fn [[_ d s]]
               [(keyword  d) (read-string s)]))))
 
-(defn move-dir [pos dir arg]
-  (prn pos dir arg)
-  (mapv (fn [p d] (+ p (* d arg))) pos dir ))
+(defn move-dir [pos dir l]
+  (cmn/v+ pos (cmn/v* dir l)))
 
-(defn change-dir [dir f arg]
-  (first
-   (drop  (/ arg 90)
-          (iterate (turns f) dir))) )
+(defn change-dir [dir f degrees]
+  (->> dir
+       (iterate (turns f))
+       (drop  (/ degrees 90))
+       first))
 
-(defn move [{:keys [dir pos] :as position} [inst arg]]
+(defn move [{:keys [pos] :as position} [inst arg]]
   (cond
     (directions inst)
     (update position :pos move-dir (directions inst) arg)
 
     (turns inst)
     (update position :pos change-dir inst arg)
+
     :else
     (update position :ship move-dir pos arg)))
 
-
 (def pos
-  {:dir [1 0]
-   :pos [10 1]
+  {:pos  [10 1]
    :ship [0 0]})
+
 (->>
  (reduce move pos instructions)
- (:ship )
- (apply + ))
+ :ship
+ (apply cmn/manhatten))

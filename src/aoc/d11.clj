@@ -27,7 +27,9 @@ L.LLLLL.LL"))
   )
 
 (def directions
-  (for [x [-1 0 1] y [-1 0 1] :when (not= x y 0)]
+  (for [x [-1 0 1]
+        y [-1 0 1]
+        :when (not= x y 0)]
     [x y]))
 
 (defn v+ [v0 v1]
@@ -37,13 +39,10 @@ L.LLLLL.LL"))
   (prn x)
   x)
 
-(defn rc [pv]
-  [(second pv) (first pv)])
-
 (defn find-move
   [wa pv dir]
-  (let [rv (first  (drop-while #(= \. (get-in wa (rc %))) (rest (iterate (partial  v+ dir) pv))))] ;
-    (when (get-in wa (rc rv)) rv)))
+  (let [rv (first  (drop-while #(= \. (get-in wa %)) (rest (iterate (partial v+ dir) pv))))] ;
+    (when (get-in wa rv) rv)))
 
 (defn neighbours [waiting-area px py]
   (let [height (count waiting-area)
@@ -51,24 +50,22 @@ L.LLLLL.LL"))
         moves (map (partial v+ [px py]) directions)]
     (->>
      moves
-     (filter (fn [[x y]] (and (<= 0 x (dec width))
-                              (<= 0 y (dec height))))
+     (filter (fn [[x y]] (and (<= 0 x (dec height))
+                              (<= 0 y (dec width))))
 
              )
-     (map #(get-in waiting-area [(second  %) (first %)])))))
+     (map #(get-in waiting-area %)))))
 
 (defn neighbours [waiting-area px py]
-  ( let [height (count waiting-area)
-         width (count (first waiting-area))
-         moves (keep #(find-move waiting-area [px py] %)   directions)]
+  ( let [moves (keep #(find-move waiting-area [px py] %)   directions)]
    (->>
     moves
     (filter identity)
-    (map #(get-in waiting-area [(second  %) (first %)])))))
+    (map #(get-in waiting-area %)))))
 
 
 (defn calc-seat [waiting-area x y]
-  (let [seat (get-in waiting-area [y x])]
+  (let [seat (get-in waiting-area [x y])]
     (if (= seat \.)
       \.
       (let [n (neighbours waiting-area x y)]
@@ -85,20 +82,21 @@ L.LLLLL.LL"))
   )
 
 (defn step [wa]
-(reduce (fn [wa* [x y]]
-          (assoc-in wa* [y x] (calc-seat wa x y))
-          )
-        wa
-        (for [x (range 0 (count (first wa)))
-              y (range 0 (count wa))]
-          [x y])))
+  (reduce (fn [wa* [x y]]
+            (assoc-in wa* [y x] (calc-seat wa x y)))
+          wa
+          (for [x (range 0 (count (first wa)))
+                y (range 0 (count wa))]
+            [x y])))
 
 (def wa1 (log  (step wa0)))
 (def wa2 (log  (step wa1)))
 
 (neighbours wa1 0 2)
 (calc-seat wa1 3 0)
+
 (defn log [x] (clojure.pprint/pprint x) x)
+
 (->> wa0
      (iterate step)
      (partition 2 1)
