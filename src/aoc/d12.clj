@@ -29,10 +29,8 @@ F11"))
   (cmn/v+ pos (cmn/v* dir l)))
 
 (defn change-dir [dir f degrees]
-  (->> dir
-       (iterate (turns f))
-       (drop  (/ degrees 90))
-       first))
+  (nth (iterate (turns f) dir)
+       (/ degrees 90)))
 
 (defn move [{:keys [pos] :as position} [inst arg]]
   (cond
